@@ -1,7 +1,7 @@
 
 # 使用 Rust 编写的动态线程池
 
-[English](README.md) | [简体中文](README.zh.md)
+[简体中文](README.md) | [English](README_en.md)
 
 1. 根据任务数量动态调整线程数
 2. 支持空闲线程超时回收（默认10s）
