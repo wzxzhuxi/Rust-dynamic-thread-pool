@@ -31,7 +31,12 @@ pub struct ThreadPool {
 
 impl ThreadPool {
     // 创建新的线程池实例
-    pub fn new(max_threads: usize) -> Self {
+    pub fn new() -> Self {
+        let max_threads = num_cpus::get(); // 获取 CPU 核心数
+        ThreadPool::with_max_threads(max_threads) // 使用 CPU 核心数创建线程池
+    }
+
+    pub fn with_max_threads(max_threads: usize) -> Self {
         ThreadPool {
             tasks: Arc::new((Mutex::new(LinkedList::new()), Condvar::new())), // 初始化任务队列
             threads: Arc::new(Mutex::new(HashMap::new())), // 初始化线程集合

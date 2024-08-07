@@ -43,7 +43,7 @@ fn monitor(pool: Arc<ThreadPool>, seconds: usize) {
 
 fn main() {
     // 创建线程池，最大线程数为100
-    let pool = Arc::new(ThreadPool::new(100)); // 创建线程池并使用Arc进行引用计数
+    let pool = Arc::new(ThreadPool::new()); // 创建线程池并使用Arc进行引用计数
 
     // 监控线程数13秒
     let pool_clone = Arc::clone(&pool); // 克隆线程池的Arc
