@@ -13,7 +13,7 @@ fn main() {
     // Create a thread pool with the default maximum number of threads supported by the hardware
     let pool = Arc::new(ThreadPool::new()); // Create a thread pool and use Arc for reference counting
 
-    // Monitor the number of threads for 13 seconds
+    // Monitor the number of threads for 20 seconds
     let pool_clone = Arc::clone(&pool); // Clone the Arc of the thread pool
     pool.submit(move || monitor(pool_clone, 20)); // Submit the monitoring task
 
