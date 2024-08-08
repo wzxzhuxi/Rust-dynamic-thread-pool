@@ -14,7 +14,7 @@ fn main() {
     // 创建线程池，默认最大线程数为硬件支持的最大线程数
     let pool = Arc::new(ThreadPool::new()); // 创建线程池并使用Arc进行引用计数
 
-    // 监控线程数13秒
+    // 监控线程数20秒
     let pool_clone = Arc::clone(&pool); // 克隆线程池的Arc
     pool.submit(move || monitor(pool_clone, 20)); // 提交监控任务
 
