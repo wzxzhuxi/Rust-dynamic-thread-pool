@@ -1,43 +1,101 @@
-
 # 使用 Rust 编写的动态线程池
 
 [简体中文](README.md) | [English](README.en.md)
 
-1. 根据任务数量动态调整线程数
-2. 支持空闲线程超时回收（默认10s）
-3. 添加大量中文注释，轻松上手
+## 特性
 
-## 使用样例：
+1. **动态线程管理** - 根据任务数量动态调整线程数
+2. **智能回收机制** - 支持空闲线程超时回收（默认10s）
+3. **零外部依赖** - 完全基于 Rust 标准库实现
+4. **高并发安全** - 解决了竞态条件和资源泄漏问题
+5. **性能优化** - 原子操作优化，减少锁竞争
+6. **详细中文注释** - 逐行注释，轻松上手学习
+
+## 架构特点
+
+### 核心组件
+- **任务队列**: 使用 `VecDeque` 实现的高性能双端队列
+- **线程管理**: 动态创建和回收工作线程
+- **同步机制**: `Arc`、`Mutex`、`Condvar` 和原子操作
+- **资源清理**: 自动清理退出线程的句柄，防止内存泄漏
+
+### 并发安全
+- 原子化的线程创建操作，避免竞态条件
+- 线程安全的任务分发和状态管理
+- 优雅的线程池关闭和资源清理
+
+## 性能表现
+
+- **低延迟**: 优化的锁策略减少线程阻塞
+- **高吞吐**: 原子操作减少锁竞争
+- **内存高效**: 及时清理退出线程，避免资源泄漏
+- **适合短期使用**: 10秒超时机制适合批量任务处理
+
+## 使用样例
 
 ```rust
+
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+use thread_pool::ThreadPool;
+
 fn main() {
-    // 创建线程池，默认最大线程数为硬件支持的最大线程数
-    let pool = Arc::new(ThreadPool::new()); // 创建线程池并使用Arc进行引用计数
+// 创建线程池，默认最大线程数为硬件支持的最大线程数
+let pool = Arc::new(ThreadPool::new());
 
     // 监控线程数20秒
-    let pool_clone = Arc::clone(&pool); // 克隆线程池的Arc
-    pool.submit(move || monitor(pool_clone, 20)); // 提交监控任务
-
+    let pool_clone = Arc::clone(&pool);
+    pool.submit(move || monitor(pool_clone, 20));
+    
     // 提交100个任务
-    let total_tasks = 100; // 总任务数为100
-    for task_id in 0..total_tasks { // 循环提交任务
-        thread::sleep(Duration::from_millis(200)); // 每次提交任务后休眠200毫秒
-        let pool_clone = Arc::clone(&pool); // 克隆线程池的Arc
-        pool_clone.submit(move || task(task_id)); // 提交任务
+    let total_tasks = 100;
+    for task_id in 0..total_tasks {
+        thread::sleep(Duration::from_millis(200));
+        let pool_clone = Arc::clone(&pool);
+        pool_clone.submit(move || task(task_id));
+    }
+    
+    // 等待所有任务完成
+    pool.wait_for_completion();
     }
 
-    // 等待所有任务完成
-    pool.wait_for_completion(); // 等待所有任务完成
+fn task(task_id: usize) {
+	println!("执行任务 {}", task_id);
+	thread::sleep(Duration::from_secs(2));
+	println!("任务 {} 完成", task_id);
 }
+
+fn monitor(pool: Arc<ThreadPool>, seconds: usize) {
+	for i in 0..seconds * 10 {
+		println!("当前线程数: {}", pool.threads_num());
+			  			wqfthread::sleep(Duration::from_millis(100));
+	}	
+}
+
 ```
 
-## 本项目库依赖：
+## 项目依赖
+
+**无外部依赖！** 完全基于 Rust 标准库实现。
 
 ```toml
+
+[package]
+name = "rust-dynamic-thread-pool"
+version = "0.2.0"
+edition = "2021"
+
 [dependencies]
-lazy_static = "1.4"
-num_cpus = "1.13"
+
+# 无需外部依赖
+
 ```
 
+## 致谢
+
 本项目设计思路源于：[senlinzhan/dpool](https://github.com/senlinzhan/dpool)  
-本项目使用的 LinkList 源于 ust 圣经：[sunface/rust-course](https://github.com/sunface/rust-course)
+基础知识学习书籍《Rust 圣经》：[sunface/rust-course](https://github.com/sunface/rust-course)
+
+
+
